@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Then & There — Edge Snap v3.1 (Zoom)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+
+    <!-- Drop Zone -->
+    <div id="dropZone" class="drop-zone">
+      <p>Drop photos here</p>
+      <p class="subtext">or click to browse</p>
+      <input type="file" id="fileInput" multiple accept="image/*" hidden>
+      <p id="photoCount" class="photo-count"></p>
+      <button id="loadSamplePhotos" class="sample-btn">Load Sample Photos</button>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="main">
+
+      <!-- Control Panel -->
+      <div class="controls">
+
+        <!-- Algorithm selector -->
+        <div class="control-section">
+          <h3>Algorithm</h3>
+          <div class="control-group">
+            <select id="algorithmSelect">
+              <option value="edgeSnapZoom" selected>Edge Snap Zoom v3.1</option>
+              <option value="edgeSnap">Edge Snap v3</option>
+            </select>
+            <small>v3.1: Map + photos zoom together</small>
+          </div>
+        </div>
+
+        <!-- Canvas Settings -->
+        <div class="control-section">
+          <h3>Canvas</h3>
+          <div class="control-group">
+            <label>Orientation</label>
+            <select id="orientation">
+              <option value="portrait" selected>Portrait (tall)</option>
+              <option value="landscape">Landscape (wide)</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>Aspect Ratio: <span id="aspectRatioValue">2.17</span></label>
+            <input type="range" id="aspectRatio" min="1.0" max="3.0" step="0.01" value="2.17">
+            <small id="aspectRatioHint">Height : Width</small>
+          </div>
+        </div>
+
+        <!-- Zoom Control (v3.1) -->
+        <div class="control-section">
+          <h3>Zoom</h3>
+          <div class="control-group">
+            <label>Map Zoom: <span id="mapSizeMultValue">1.0</span>×</label>
+            <input type="range" id="mapSizeMult" min="0.5" max="2.0" step="0.05" value="1.0">
+            <small>&lt;1 = zoomed in, &gt;1 = zoomed out</small>
+          </div>
+        </div>
+
+        <!-- Map Style -->
+        <div class="control-section">
+          <h3>Map Style</h3>
+
+          <div class="control-group">
+            <select id="mapStyle">
+              <option value="cartodb_voyager" selected>Voyager</option>
+              <option value="streets">Streets</option>
+              <option value="cartodb_light">Light</option>
+              <option value="cartodb_dark">Dark</option>
+              <option value="terrain">Terrain</option>
+              <option value="toner">Toner (B&W)</option>
+              <option value="watercolor">Watercolor</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Clustering -->
+        <div class="control-section">
+          <h3>Clustering</h3>
+
+          <div class="control-group">
+            <label>Epsilon (km): <span id="epsilonValue">1.0</span></label>
+            <input type="range" id="epsilon" min="0.1" max="10" step="0.1" value="1.0">
+          </div>
+
+          <div class="control-group">
+            <label>Min Points: <span id="minPointsValue">2</span></label>
+            <input type="range" id="minPoints" min="1" max="10" step="1" value="2">
+          </div>
+
+          <div class="control-group">
+            <label>
+              <input type="checkbox" id="adaptive" checked>
+              Adaptive Epsilon
+            </label>
+          </div>
+        </div>
+
+        <!-- Cluster Sizing -->
+        <div class="control-section">
+          <h3>Cluster Sizing</h3>
+
+          <div class="control-group">
+            <label>Ellipse Mult (H:W): <span id="ellipseMultValue">2.17</span></label>
+            <input type="range" id="ellipseMult" min="1.0" max="3.0" step="0.01" value="2.17">
+          </div>
+
+          <div class="control-group">
+            <label>Photo Count Exp: <span id="photoCountExpValue">0.5</span></label>
+            <input type="range" id="photoCountExp" min="0.1" max="2.0" step="0.05" value="0.5">
+          </div>
+
+          <div class="control-group">
+            <label>Radius Mult: <span id="radiusMultValue">1.0</span></label>
+            <input type="range" id="radiusMult" min="0.25" max="10.0" step="0.25" value="1.0">
+          </div>
+
+          <div class="control-group">
+            <label>Max Radius (%): <span id="maxRadiusValue">40</span>%</label>
+            <input type="range" id="maxRadius" min="20" max="80" step="5" value="40">
+            <small>% of smaller canvas dimension</small>
+          </div>
+        </div>
+
+        <!-- Photo Sizing -->
+        <div class="control-section">
+          <h3>Photo Sizing</h3>
+
+          <div class="control-group">
+            <label>Hero Size (% of canvas): <span id="heroSizeValue">5</span>%</label>
+            <input type="range" id="heroSize" min="1" max="80" step="1" value="5">
+          </div>
+
+          <div class="control-group">
+            <label>Size Step Ratio: <span id="sizeStepValue">0.25</span></label>
+            <input type="range" id="sizeStep" min="0.1" max="0.5" step="0.05" value="0.25">
+          </div>
+        </div>
+
+        <!-- Size Probabilities -->
+        <div class="control-section">
+          <h3>Size Probabilities</h3>
+
+          <div class="control-group">
+            <label>Early Medium %: <span id="earlyMediumValue">85</span>%</label>
+            <input type="range" id="earlyMedium" min="0" max="100" step="5" value="85">
+          </div>
+
+          <div class="control-group">
+            <label>Late Medium %: <span id="lateMediumValue">40</span>%</label>
+            <input type="range" id="lateMedium" min="0" max="100" step="5" value="40">
+          </div>
+
+          <div class="control-group">
+            <label>Placement Attempts: <span id="attemptsValue">40</span></label>
+            <input type="range" id="attempts" min="5" max="50" step="5" value="40">
+          </div>
+        </div>
+
+        <!-- Post-Processing -->
+        <div class="control-section">
+          <h3>Post-Processing</h3>
+
+          <div class="control-group">
+            <label>Image Spread: <span id="spreadValue">0.85</span>x</label>
+            <input type="range" id="spread" min="0.5" max="2.0" step="0.05" value="0.85">
+          </div>
+
+          <div class="control-group">
+            <label>Rotation Range: <span id="rotationValue">0</span>°</label>
+            <input type="range" id="rotation" min="0" max="20" step="1" value="0">
+          </div>
+        </div>
+
+        <!-- Edge Overflow -->
+        <div class="control-section">
+          <h3>Edge Overflow</h3>
+
+          <div class="control-group">
+            <label>Overflow Mode</label>
+            <select id="overflowMode">
+              <option value="crop" selected>Crop at edge</option>
+              <option value="delete">Delete photo</option>
+              <option value="shift">Shift inward</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Debug -->
+        <div class="control-section">
+          <h3>Debug Overlays</h3>
+          <label><input type="checkbox" id="debugClusters"> Cluster colors</label>
+          <label><input type="checkbox" id="debugEllipses"> Cluster ellipses</label>
+          <label><input type="checkbox" id="debugBboxes"> Bounding boxes</label>
+          <label><input type="checkbox" id="debugPins"> Pin markers</label>
+          <label><input type="checkbox" id="debugBounds"> Photo bounds</label>
+          <label><input type="checkbox" id="debugViewport"> Viewport (v3.1)</label>
+        </div>
+
+        <!-- Actions -->
+        <div class="control-section">
+          <div class="control-group seed-group">
+            <label>Seed</label>
+            <input type="number" id="seed" value="4821">
+            <button id="randomSeed">Rand</button>
+          </div>
+
+          <button id="regenerate" class="primary">Regenerate</button>
+          <button id="savePng">Save PNG</button>
+          <button id="exportConfig">Export Config</button>
+        </div>
+
+      </div>
+
+      <!-- Canvas Area -->
+      <div class="canvas-container">
+        <canvas id="collageCanvas" width="1000" height="2170"></canvas>
+        <div id="mapContainer" class="hidden"></div>
+      </div>
+
+    </div>
+
+    <!-- Status Bar -->
+    <div id="status" class="status-bar">
+      <span id="statusText">Ready — drop photos to begin</span>
+      <span id="placementStats"></span>
+    </div>
+
+  </div>
+
+  <script src="https://unpkg.com/exif-js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

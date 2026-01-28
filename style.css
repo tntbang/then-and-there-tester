@@ -1,0 +1,238 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #1a1a1a;
+  color: #e0e0e0;
+  min-height: 100vh;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 10px;
+  gap: 10px;
+}
+
+/* Drop Zone */
+.drop-zone {
+  border: 2px dashed #555;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #252525;
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+  border-color: #4a9eff;
+  background: #2a2a3a;
+}
+
+.drop-zone p {
+  margin: 5px 0;
+}
+
+.drop-zone .subtext {
+  font-size: 0.85em;
+  color: #888;
+}
+
+.drop-zone .photo-count {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #4a9eff;
+}
+
+/* Main Layout */
+.main {
+  display: flex;
+  flex: 1;
+  gap: 15px;
+  min-height: 0;
+}
+
+/* Control Panel */
+.controls {
+  width: 240px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  background: #252525;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.control-section {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #333;
+}
+
+.control-section h3 {
+  font-size: 0.9em;
+  color: #888;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.control-group {
+  margin-bottom: 12px;
+}
+
+.control-group label {
+  display: block;
+  font-size: 0.85em;
+  margin-bottom: 4px;
+  color: #bbb;
+}
+
+.control-group label span {
+  color: #4a9eff;
+  font-weight: bold;
+}
+
+.control-group input[type="range"] {
+  width: 100%;
+  cursor: pointer;
+}
+
+.control-group select {
+  width: 100%;
+  padding: 6px 8px;
+  background: #333;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-size: 0.9em;
+}
+
+.control-group input[type="number"] {
+  width: 80px;
+  padding: 6px 8px;
+  background: #333;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-size: 0.9em;
+}
+
+.control-group input[type="checkbox"] {
+  margin-right: 6px;
+}
+
+.control-section label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.85em;
+  cursor: pointer;
+}
+
+.seed-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.seed-group label {
+  margin: 0;
+}
+
+.seed-group input {
+  flex: 1;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  background: #333;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #e0e0e0;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: all 0.2s;
+}
+
+button:hover {
+  background: #444;
+}
+
+button.primary {
+  background: #2a5a8a;
+  border-color: #3a6a9a;
+}
+
+button.primary:hover {
+  background: #3a6a9a;
+}
+
+.seed-group button {
+  width: auto;
+  padding: 6px 10px;
+  margin: 0;
+}
+
+/* Canvas Area */
+.canvas-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a0a;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+#collageCanvas {
+  max-width: 100%;
+  max-height: 100%;
+  background: #222;
+}
+
+#mapContainer {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  z-index: -1;
+}
+
+#mapContainer.hidden {
+  display: none;
+}
+
+/* Status Bar */
+.status-bar {
+  padding: 10px 15px;
+  background: #252525;
+  border-radius: 8px;
+  font-size: 0.85em;
+  color: #888;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
