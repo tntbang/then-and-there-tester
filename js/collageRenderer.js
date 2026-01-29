@@ -253,17 +253,13 @@ function drawClusterEllipses(ctx, clusterInfo) {
     const cluster = clusterInfo[i];
     const color = CLUSTER_COLORS[i % CLUSTER_COLORS.length];
     const ellipseMult = cluster.ellipseMult || 2.17;
-    const isLandscape = cluster.isLandscape || false;
 
-    // Draw ellipse - orientation determines which axis is stretched
-    const radiusX = isLandscape ? cluster.radius * ellipseMult : cluster.radius;
-    const radiusY = isLandscape ? cluster.radius : cluster.radius * ellipseMult;
-
+    // Portrait ellipse: Y-axis stretched
     ctx.beginPath();
     ctx.ellipse(
       cluster.x, cluster.y,
-      radiusX,
-      radiusY,
+      cluster.radius,                    // radiusX (width)
+      cluster.radius * ellipseMult,      // radiusY (height stretched)
       0,                                 // rotation
       0, Math.PI * 2                     // full ellipse
     );
@@ -622,17 +618,13 @@ function drawClusterEllipsesScaled(ctx, clusterInfo, scale) {
     const cluster = clusterInfo[i];
     const color = CLUSTER_COLORS[i % CLUSTER_COLORS.length];
     const ellipseMult = cluster.ellipseMult || 2.17;
-    const isLandscape = cluster.isLandscape || false;
 
-    // Orientation determines which axis is stretched
-    const radiusX = isLandscape ? cluster.radius * ellipseMult : cluster.radius;
-    const radiusY = isLandscape ? cluster.radius : cluster.radius * ellipseMult;
-
+    // Portrait ellipse: Y-axis stretched
     ctx.beginPath();
     ctx.ellipse(
       cluster.x, cluster.y,
-      radiusX,
-      radiusY,
+      cluster.radius,                    // radiusX (width)
+      cluster.radius * ellipseMult,      // radiusY (height stretched)
       0,
       0, Math.PI * 2
     );

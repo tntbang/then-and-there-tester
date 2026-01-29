@@ -106,30 +106,20 @@ function areaToDimensions(targetArea, photo) {
 
 /**
  * Check if two ellipses would overlap
- * In portrait mode: Y-axis is stretched by ellipseMult
- * In landscape mode: X-axis is stretched by ellipseMult
+ * Uses portrait ellipses: Y-axis is stretched by ellipseMult
  */
-function ellipsesWouldOverlap(clusterA, clusterB, expansionFactor, ellipseMult, isLandscape) {
+function ellipsesWouldOverlap(clusterA, clusterB, expansionFactor, ellipseMult) {
   const radiusA = clusterA.radius * expansionFactor;
   const radiusB = clusterB.radius * expansionFactor;
 
   const dx = clusterB.masterPos.x - clusterA.masterPos.x;
   const dy = clusterB.masterPos.y - clusterA.masterPos.y;
 
-  let normalizedDist;
-  if (isLandscape) {
-    // Landscape: X-axis stretched
-    normalizedDist = Math.sqrt(
-      (dx / ((radiusA + radiusB) * ellipseMult)) ** 2 +
-      (dy / (radiusA + radiusB)) ** 2
-    );
-  } else {
-    // Portrait: Y-axis stretched
-    normalizedDist = Math.sqrt(
-      (dx / (radiusA + radiusB)) ** 2 +
-      (dy / ((radiusA + radiusB) * ellipseMult)) ** 2
-    );
-  }
+  // Portrait ellipse: Y-axis stretched
+  const normalizedDist = Math.sqrt(
+    (dx / (radiusA + radiusB)) ** 2 +
+    (dy / ((radiusA + radiusB) * ellipseMult)) ** 2
+  );
 
   return normalizedDist < 1.0;
 }
@@ -137,7 +127,7 @@ function ellipsesWouldOverlap(clusterA, clusterB, expansionFactor, ellipseMult, 
 /**
  * Expand cluster radiuses until they nearly touch
  */
-function expandClustersToFill(clusters, masterCanvas, ellipseMult, maxRadius, isLandscape) {
+function expandClustersToFill(clusters, masterCanvas, ellipseMult, maxRadius) {
   const maxIterations = 50;
   const expansionFactor = 1.05;
 
@@ -147,7 +137,7 @@ function expandClustersToFill(clusters, masterCanvas, ellipseMult, maxRadius, is
     // Check if expansion would cause overlap between clusters
     for (let a = 0; a < clusters.length; a++) {
       for (let b = a + 1; b < clusters.length; b++) {
-        if (ellipsesWouldOverlap(clusters[a], clusters[b], expansionFactor, ellipseMult, isLandscape)) {
+        if (ellipsesWouldOverlap(clusters[a], clusters[b], expansionFactor, ellipseMult)) {
           canExpand = false;
           break;
         }
@@ -163,24 +153,15 @@ function expandClustersToFill(clusters, masterCanvas, ellipseMult, maxRadius, is
     }
 
     // Check if expansion would push clusters outside master canvas
+    // Portrait ellipse: Y-axis stretched
     for (const cluster of clusters) {
       const newRadius = cluster.radius * expansionFactor;
       const ellipseExtent = newRadius * ellipseMult;
 
-      let outOfBounds;
-      if (isLandscape) {
-        // Landscape: X-axis stretched
-        outOfBounds = cluster.masterPos.x - ellipseExtent < 0 ||
-                      cluster.masterPos.x + ellipseExtent > masterCanvas.width ||
-                      cluster.masterPos.y - newRadius < 0 ||
-                      cluster.masterPos.y + newRadius > masterCanvas.height;
-      } else {
-        // Portrait: Y-axis stretched
-        outOfBounds = cluster.masterPos.x - newRadius < 0 ||
-                      cluster.masterPos.x + newRadius > masterCanvas.width ||
-                      cluster.masterPos.y - ellipseExtent < 0 ||
-                      cluster.masterPos.y + ellipseExtent > masterCanvas.height;
-      }
+      const outOfBounds = cluster.masterPos.x - newRadius < 0 ||
+                          cluster.masterPos.x + newRadius > masterCanvas.width ||
+                          cluster.masterPos.y - ellipseExtent < 0 ||
+                          cluster.masterPos.y + ellipseExtent > masterCanvas.height;
 
       if (outOfBounds) {
         canExpand = false;
@@ -268,20 +249,16 @@ function getRandomEdgePosition(bbox, edge, photoWidth, photoHeight, rng) {
 
 /**
  * Check if point is within cluster ellipse
+ * Portrait ellipse: Y-axis stretched by ellipseMult
  */
-function isWithinClusterEllipse(x, y, cluster, ellipseMult, isLandscape) {
+function isWithinClusterEllipse(x, y, cluster, ellipseMult) {
   const dx = x - cluster.masterPos.x;
   const dy = y - cluster.masterPos.y;
   const r = cluster.radius;
 
-  let normalizedDist;
-  if (isLandscape) {
-    // Landscape: X-axis stretched
-    normalizedDist = (dx * dx) / ((r * ellipseMult) * (r * ellipseMult)) + (dy * dy) / (r * r);
-  } else {
-    // Portrait: Y-axis stretched
-    normalizedDist = (dx * dx) / (r * r) + (dy * dy) / ((r * ellipseMult) * (r * ellipseMult));
-  }
+  // Ellipse equation: x²/a² + y²/b² ≤ 1
+  // Portrait: a = r (width), b = r * ellipseMult (height)
+  const normalizedDist = (dx * dx) / (r * r) + (dy * dy) / ((r * ellipseMult) * (r * ellipseMult));
 
   return normalizedDist <= 1.0;
 }
@@ -334,14 +311,14 @@ function pickSizeCategory(photosPlacedAfterHero, config, rng) {
 /**
  * Try to place a photo using edge snapping
  */
-function tryPlacePhoto(photo, width, height, sizeCategory, cluster, config, rng, isLandscape) {
+function tryPlacePhoto(photo, width, height, sizeCategory, cluster, config, rng) {
   const bbox = getClusterBoundingBox(cluster.placedPhotos);
 
   for (let attempt = 0; attempt < config.placementAttempts; attempt++) {
     const edge = Math.floor(rng.next() * 4);
     const position = getRandomEdgePosition(bbox, edge, width, height, rng);
 
-    if (!isWithinClusterEllipse(position.x, position.y, cluster, config.ellipseMult, isLandscape)) {
+    if (!isWithinClusterEllipse(position.x, position.y, cluster, config.ellipseMult)) {
       continue;
     }
 
@@ -615,9 +592,6 @@ export function edgeSnapZoomLayout(photos, clusters, params, canvasSize, mapRect
     imageSpread: params.imageSpread ?? 1.0,
     rotationRange: params.rotationRange ?? 10,
 
-    // Orientation
-    orientation: params.orientation ?? 'portrait'
-
     // Edge overflow
     edgeOverflowMode: params.edgeOverflowMode ?? 'crop'
   };
@@ -650,7 +624,6 @@ export function edgeSnapZoomLayout(photos, clusters, params, canvasSize, mapRect
   // PHASE 3: CLUSTER SIZING
   // ═══════════════════════════════════════════════════════════════
 
-  const isLandscape = config.orientation === 'landscape';
   const minRadius = Math.min(masterCanvas.width, masterCanvas.height) * 0.05;
   const maxRadius = Math.min(masterCanvas.width, masterCanvas.height) * config.maxRadiusPercent;
 
@@ -662,23 +635,15 @@ export function edgeSnapZoomLayout(photos, clusters, params, canvasSize, mapRect
 
   // Expand clusters to fill available space
   if (clusters.length > 1) {
-    expandClustersToFill(clusters, masterCanvas, config.ellipseMult, maxRadius, isLandscape);
+    expandClustersToFill(clusters, masterCanvas, config.ellipseMult, maxRadius);
   } else if (clusters.length === 1) {
     // For single cluster, use slightly less than maxRadius to leave margin
     const singleClusterMax = config.maxRadiusPercent * 0.875;  // ~35% when maxRadius is 40%
-    if (isLandscape) {
-      clusters[0].radius = Math.min(
-        masterCanvas.width / config.ellipseMult * singleClusterMax,
-        masterCanvas.height * singleClusterMax,
-        maxRadius
-      );
-    } else {
-      clusters[0].radius = Math.min(
-        masterCanvas.width * singleClusterMax,
-        masterCanvas.height / config.ellipseMult * singleClusterMax,
-        maxRadius
-      );
-    }
+    clusters[0].radius = Math.min(
+      masterCanvas.width * singleClusterMax,
+      masterCanvas.height / config.ellipseMult * singleClusterMax,
+      maxRadius
+    );
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -741,7 +706,7 @@ export function edgeSnapZoomLayout(photos, clusters, params, canvasSize, mapRect
       const { width, height } = areaToDimensions(targetArea, photo);
 
       const placement = tryPlacePhoto(
-        photo, width, height, sizeCategory, cluster, config, rng, isLandscape
+        photo, width, height, sizeCategory, cluster, config, rng
       );
 
       if (placement) {
@@ -801,7 +766,6 @@ export function edgeSnapZoomLayout(photos, clusters, params, canvasSize, mapRect
     y: c.masterPos.y,
     radius: c.radius,
     ellipseMult: config.ellipseMult,
-    isLandscape: isLandscape,
     photoCount: c.photos.length,
     placedCount: c.placedPhotos ? c.placedPhotos.length : 0
   }));

@@ -197,32 +197,19 @@ export function initPhotoLoader(dropZoneId, onPhotosLoaded) {
     }
   });
 
-  // Prevent browser from opening files when dropped anywhere on the page
-  // This stops Chrome from opening images in new tabs
-  window.addEventListener('dragover', (e) => {
-    e.preventDefault();
-  }, false);
-
-  window.addEventListener('drop', (e) => {
-    e.preventDefault();
-  }, false);
-
-  // Drag and drop events for the dropZone
+  // Drag and drop events
   dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
-    e.stopPropagation();
     dropZone.classList.add('dragover');
-  }, false);
+  });
 
   dropZone.addEventListener('dragleave', (e) => {
     e.preventDefault();
-    e.stopPropagation();
     dropZone.classList.remove('dragover');
-  }, false);
+  });
 
   dropZone.addEventListener('drop', async (e) => {
     e.preventDefault();
-    e.stopPropagation();
     dropZone.classList.remove('dragover');
 
     const files = e.dataTransfer.files;
@@ -230,7 +217,7 @@ export function initPhotoLoader(dropZoneId, onPhotosLoaded) {
       await processFiles(files);
       updatePhotoCount();
     }
-  }, false);
+  });
 
   console.log('Photo loader initialized');
 }

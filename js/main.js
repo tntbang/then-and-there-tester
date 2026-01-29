@@ -18,7 +18,6 @@ const state = {
     algorithm: 'edgeSnapZoom',  // Use v3.1 with viewport zoom by default
     canvas: {
       aspectRatio: 2.17,
-      orientation: 'portrait',  // 'portrait' or 'landscape'
       width: 1000,
       height: 2170
     },
@@ -73,30 +72,18 @@ function getCanvasSize() {
 }
 
 /**
- * Update canvas dimensions based on aspect ratio and orientation
+ * Update canvas dimensions based on aspect ratio
  */
 function updateCanvasDimensions() {
-  const baseSize = state.config.canvas.width;  // Base dimension (1000px)
+  const baseWidth = 1000;
   const aspectRatio = state.config.canvas.aspectRatio;
-  const orientation = state.config.canvas.orientation;
 
-  let width, height;
-  if (orientation === 'portrait') {
-    // Portrait: height = base × aspectRatio (taller than wide)
-    width = baseSize;
-    height = Math.round(baseSize * aspectRatio);
-  } else {
-    // Landscape: width = base × aspectRatio (wider than tall)
-    height = baseSize;
-    width = Math.round(baseSize * aspectRatio);
-  }
-
-  state.config.canvas.width = width;
-  state.config.canvas.height = height;
+  state.config.canvas.width = baseWidth;
+  state.config.canvas.height = Math.round(baseWidth * aspectRatio);
 
   if (canvas) {
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = state.config.canvas.width;
+    canvas.height = state.config.canvas.height;
   }
 }
 
@@ -212,8 +199,7 @@ function renderLayout() {
       imageSpread: layout.imageSpread,
       rotationRange: layout.rotationRange,
       edgeOverflowMode: layout.edgeOverflowMode,
-      masterScale: layout.masterScale,  // v3.1 only
-      orientation: state.config.canvas.orientation  // 'portrait' or 'landscape'
+      masterScale: layout.masterScale  // v3.1 only
     },
     canvasSize,
     mapRect,
@@ -329,19 +315,6 @@ function exportConfig() {
  * Set up all UI event listeners
  */
 function setupEventListeners() {
-  // Orientation toggle
-  const orientationSelect = document.getElementById('orientation');
-  const aspectRatioHint = document.getElementById('aspectRatioHint');
-  orientationSelect?.addEventListener('change', async (e) => {
-    state.config.canvas.orientation = e.target.value;
-    // Update the hint text
-    if (aspectRatioHint) {
-      aspectRatioHint.textContent = e.target.value === 'portrait' ? 'Height : Width' : 'Width : Height';
-    }
-    updateCanvasDimensions();
-    await regenerate();
-  });
-
   // Canvas aspect ratio
   const aspectRatioSlider = document.getElementById('aspectRatio');
   const aspectRatioValue = document.getElementById('aspectRatioValue');
