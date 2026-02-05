@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pinboard Algorithm Tester</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Photo Panel (Left) -->
+    <aside class="panel photo-panel">
+      <div class="panel-header">
+        <h2>Photos</h2>
+        <span class="photo-count" id="photoCount">0 / 9 photos</span>
+      </div>
+
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" multiple accept="image/*" hidden>
+        <div class="upload-content">
+          <span class="upload-icon">📷</span>
+          <span class="upload-text">Drop photos here or click to upload</span>
+        </div>
+      </div>
+
+      <div class="photo-list" id="photoList"></div>
+
+      <div class="panel-footer">
+        <button class="btn btn-danger" id="deleteAllBtn">Delete All</button>
+      </div>
+    </aside>
+
+    <!-- Canvas Panel (Center) -->
+    <main class="panel canvas-panel">
+      <div class="canvas-container" id="canvasContainer">
+        <canvas id="mainCanvas"></canvas>
+      </div>
+      <div class="canvas-controls">
+        <button class="btn btn-primary" id="exportBtn">Export</button>
+      </div>
+    </main>
+
+    <!-- Parameter Panel (Right) -->
+    <aside class="panel parameter-panel">
+      <div class="panel-header">
+        <h2>Parameters</h2>
+      </div>
+
+      <div class="params-section">
+        <h3>Global Settings</h3>
+        <div id="globalParams">
+          <div class="param-group">
+            <label>Orientation</label>
+            <div class="toggle-group">
+              <button class="toggle-btn active" data-value="portrait">Portrait</button>
+              <button class="toggle-btn" data-value="landscape">Landscape</button>
+            </div>
+          </div>
+
+          <div class="param-group">
+            <label>Aspect Ratio</label>
+            <span class="param-value">2.17:1</span>
+          </div>
+
+          <div class="param-group">
+            <label>Seed</label>
+            <div class="seed-control">
+              <button class="btn btn-small" id="seedDown">−</button>
+              <input type="number" id="seedInput" value="12345" min="0">
+              <button class="btn btn-small" id="seedUp">+</button>
+              <button class="btn btn-small" id="seedRandom" title="Randomize">🎲</button>
+            </div>
+          </div>
+
+          <div class="param-group">
+            <label>Arrangement</label>
+            <select id="arrangementSelect">
+              <option value="grid">Grid</option>
+            </select>
+          </div>
+
+          <div class="param-group">
+            <label>Background Style</label>
+            <select id="pinboardStyle">
+              <option value="solid">Solid</option>
+              <option value="polkadots">Polkadots</option>
+              <option value="stripes">Stripes</option>
+              <option value="cork">Cork</option>
+              <option value="white">White</option>
+              <option value="black">Black</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="params-section">
+        <h3>Arrangement Parameters</h3>
+        <div id="arrangementParams"></div>
+      </div>
+
+      <div class="params-section">
+        <h3>Color Palette</h3>
+        <div class="palette-preview" id="palettePreview">
+          <div class="palette-colors">
+            <div class="palette-swatch" style="background: #e85d4c"></div>
+            <div class="palette-swatch" style="background: #e8944c"></div>
+            <div class="palette-swatch" style="background: #e8c84c"></div>
+            <div class="palette-swatch" style="background: #b8e84c"></div>
+            <div class="palette-swatch" style="background: #4ce885"></div>
+          </div>
+          <button class="btn btn-small" id="changePaletteBtn">Change</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Palette Modal -->
+  <div class="modal" id="paletteModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Select Color Palette</h2>
+        <button class="modal-close" id="closePaletteModal">&times;</button>
+      </div>
+      <div class="modal-body" id="paletteOptions"></div>
+      <div class="modal-footer">
+        <button class="btn" id="regeneratePalettes">Regenerate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Focal Point Modal -->
+  <div class="modal" id="focalPointModal">
+    <div class="modal-content focal-point-modal">
+      <div class="modal-header">
+        <h2>Set Focal Point</h2>
+        <button class="modal-close" id="closeFocalModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="focal-point-preview" id="focalPointPreview">
+          <img id="focalPointImage" src="" alt="Photo">
+          <div class="focal-point-crosshair" id="focalCrosshair"></div>
+        </div>
+        <p class="focal-point-hint">Click on the image to set the focal point</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
