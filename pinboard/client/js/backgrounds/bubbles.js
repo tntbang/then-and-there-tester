@@ -13,8 +13,8 @@ registerBackground({
     { id: 'color1', name: 'Color 1', type: 'palette-color', default: 1 },
     { id: 'color2', name: 'Color 2', type: 'palette-color', default: 2 },
     { id: 'density', name: 'Density', type: 'number', default: 30, min: 5, max: 80, step: 1 },
-    { id: 'minSize', name: 'Min Size', type: 'number', default: 10, min: 5, max: 50, step: 1 },
-    { id: 'maxSize', name: 'Max Size', type: 'number', default: 60, min: 20, max: 150, step: 5 },
+    { id: 'minSize', name: 'Min Size', type: 'number', default: 10, min: 5, max: 50, step: 1, unit: 'px' },
+    { id: 'maxSize', name: 'Max Size', type: 'number', default: 60, min: 20, max: 150, step: 5, unit: 'px' },
     { id: 'opacity', name: 'Opacity', type: 'number', default: 30, min: 5, max: 80, step: 5, suffix: '%' }
   ],
   render(ctx, width, height, params, palette, rng) {

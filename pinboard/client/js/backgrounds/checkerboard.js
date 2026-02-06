@@ -10,7 +10,7 @@ registerBackground({
   schema: [
     { id: 'color1', name: 'Color 1', type: 'palette-color', default: 0 },
     { id: 'color2', name: 'Color 2', type: 'palette-color', default: 1 },
-    { id: 'cellSize', name: 'Cell Size', type: 'number', default: 30, min: 8, max: 80, step: 2 }
+    { id: 'cellSize', name: 'Cell Size', type: 'number', default: 30, min: 8, max: 80, step: 2, unit: 'px' }
   ],
   render(ctx, width, height, params, palette) {
     const c1 = resolveColor(params.color1, palette);

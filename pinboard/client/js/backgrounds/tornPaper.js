@@ -10,7 +10,7 @@ registerBackground({
   schema: [
     { id: 'topColor', name: 'Top Layer', type: 'palette-color', default: 'white' },
     { id: 'bottomColor', name: 'Under Layer', type: 'palette-color', default: 0 },
-    { id: 'tearWidth', name: 'Tear Width', type: 'number', default: 30, min: 10, max: 80, step: 5 },
+    { id: 'tearWidth', name: 'Tear Width', type: 'number', default: 30, min: 10, max: 80, step: 5, unit: 'px' },
     { id: 'roughness', name: 'Roughness', type: 'number', default: 50, min: 10, max: 100, step: 5, suffix: '%' },
     {
       id: 'tearSide', name: 'Tear Side', type: 'select', default: 'bottom',
@@ -23,7 +23,7 @@ registerBackground({
     },
     { id: 'showShadow', name: 'Paper Shadow', type: 'boolean', default: true }
   ],
-  render(ctx, width, height, params, palette, rng) {
+  render(ctx, width, height, params, palette, rng, scale = 1) {
     const topColor = resolveColor(params.topColor, palette);
     const bottomColor = resolveColor(params.bottomColor, palette);
     const tearWidth = params.tearWidth || 30;
@@ -39,7 +39,7 @@ registerBackground({
     const isHorizontal = tearSide === 'top' || tearSide === 'bottom';
     const maxDim = isHorizontal ? width : height;
     const points = [];
-    const step = 3;
+    const step = 3 * scale;
 
     for (let i = 0; i <= maxDim; i += step) {
       const jag = (rng.random() - 0.5) * tearWidth * roughness;
@@ -93,9 +93,9 @@ registerBackground({
     if (showShadow) {
       ctx.save();
       ctx.shadowColor = 'rgba(0, 0, 0, 0.25)';
-      ctx.shadowBlur = 8;
-      ctx.shadowOffsetX = tearSide === 'left' ? -3 : tearSide === 'right' ? 3 : 0;
-      ctx.shadowOffsetY = tearSide === 'top' ? -3 : tearSide === 'bottom' ? 3 : 0;
+      ctx.shadowBlur = 8 * scale;
+      ctx.shadowOffsetX = (tearSide === 'left' ? -3 : tearSide === 'right' ? 3 : 0) * scale;
+      ctx.shadowOffsetY = (tearSide === 'top' ? -3 : tearSide === 'bottom' ? 3 : 0) * scale;
       ctx.fillStyle = topColor;
       ctx.fill();
       ctx.restore();

@@ -21,12 +21,13 @@ registerBackground({
     },
     { id: 'grainAmount', name: 'Grain', type: 'number', default: 30, min: 0, max: 100, step: 5, suffix: '%' }
   ],
-  render(ctx, width, height, params, palette, rng) {
+  render(ctx, width, height, params, palette, rng, scale = 1) {
     const bgColor = resolveColor(params.bgColor, palette);
     const paperType = params.paperType || 'smooth';
     const grainAmount = (params.grainAmount || 30) / 100;
     const rgb = hexToRGB(bgColor);
     const seed = rng.randomInt(0, 100000);
+    const s = scale; // Scale noise frequencies for resolution independence
 
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, width, height);
@@ -42,21 +43,21 @@ registerBackground({
         switch (paperType) {
           case 'smooth':
             // Very subtle noise
-            variation = simplexNoise2D(x / 80, y / 80, seed) * 8 * grainAmount;
+            variation = simplexNoise2D(x / (80 * s), y / (80 * s), seed) * 8 * grainAmount;
             break;
           case 'kraft':
             // Rougher, directional grain
-            variation = simplexNoise2D(x / 30, y / 60, seed) * 15 * grainAmount;
-            variation += simplexNoise2D(x / 10, y / 20, seed + 1) * 8 * grainAmount;
+            variation = simplexNoise2D(x / (30 * s), y / (60 * s), seed) * 15 * grainAmount;
+            variation += simplexNoise2D(x / (10 * s), y / (20 * s), seed + 1) * 8 * grainAmount;
             break;
           case 'watercolor':
             // Soft blotchy texture
-            variation = simplexNoise2D(x / 60, y / 60, seed) * 20 * grainAmount;
-            variation += simplexNoise2D(x / 20, y / 20, seed + 1) * 10 * grainAmount;
+            variation = simplexNoise2D(x / (60 * s), y / (60 * s), seed) * 20 * grainAmount;
+            variation += simplexNoise2D(x / (20 * s), y / (20 * s), seed + 1) * 10 * grainAmount;
             break;
           case 'cardstock':
             // Fine, uniform grain
-            variation = simplexNoise2D(x / 15, y / 15, seed) * 6 * grainAmount;
+            variation = simplexNoise2D(x / (15 * s), y / (15 * s), seed) * 6 * grainAmount;
             variation += (rng.random() - 0.5) * 4 * grainAmount;
             break;
         }

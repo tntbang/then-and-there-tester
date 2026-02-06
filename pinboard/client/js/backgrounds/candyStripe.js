@@ -11,7 +11,7 @@ registerBackground({
     { id: 'color1', name: 'Color 1', type: 'palette-color', default: 0 },
     { id: 'color2', name: 'Color 2', type: 'palette-color', default: 1 },
     { id: 'color3', name: 'Color 3', type: 'palette-color', default: 2 },
-    { id: 'width', name: 'Stripe Width', type: 'number', default: 20, min: 6, max: 60, step: 2 },
+    { id: 'width', name: 'Stripe Width', type: 'number', default: 20, min: 6, max: 60, step: 2, unit: 'px' },
     { id: 'ratio', name: 'Width Ratio', type: 'number', default: 50, min: 20, max: 80, step: 5, suffix: '%' },
     { id: 'angle', name: 'Angle', type: 'number', default: 45, min: 0, max: 180, step: 5, suffix: '°' }
   ],

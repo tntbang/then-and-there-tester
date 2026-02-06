@@ -11,10 +11,10 @@ registerBackground({
     { id: 'color1', name: 'Color 1', type: 'palette-color', default: 0 },
     { id: 'color2', name: 'Color 2', type: 'palette-color', default: 1 },
     { id: 'lineColor', name: 'Stitch Color', type: 'palette-color', default: 'white' },
-    { id: 'cellSize', name: 'Diamond Size', type: 'number', default: 40, min: 15, max: 80, step: 5 },
+    { id: 'cellSize', name: 'Diamond Size', type: 'number', default: 40, min: 15, max: 80, step: 5, unit: 'px' },
     { id: 'showLines', name: 'Show Stitches', type: 'boolean', default: true }
   ],
-  render(ctx, width, height, params, palette) {
+  render(ctx, width, height, params, palette, rng, scale = 1) {
     const c1 = resolveColor(params.color1, palette);
     const c2 = resolveColor(params.color2, palette);
     const lineColor = resolveColor(params.lineColor, palette);
@@ -51,8 +51,8 @@ registerBackground({
     // Draw stitch lines
     if (showLines) {
       ctx.strokeStyle = lineColor;
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4, 4]);
+      ctx.lineWidth = 1 * scale;
+      ctx.setLineDash([4 * scale, 4 * scale]);
 
       // Diagonal lines going both directions
       const diagonal = Math.sqrt(width * width + height * height);

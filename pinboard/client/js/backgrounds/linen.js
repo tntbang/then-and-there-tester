@@ -11,9 +11,9 @@ registerBackground({
   schema: [
     { id: 'bgColor', name: 'Color', type: 'palette-color', default: 0 },
     { id: 'intensity', name: 'Intensity', type: 'number', default: 40, min: 10, max: 80, step: 5, suffix: '%' },
-    { id: 'threadSpacing', name: 'Thread Spacing', type: 'number', default: 4, min: 2, max: 10, step: 1 }
+    { id: 'threadSpacing', name: 'Thread Spacing', type: 'number', default: 4, min: 2, max: 10, step: 1, unit: 'px' }
   ],
-  render(ctx, width, height, params, palette, rng) {
+  render(ctx, width, height, params, palette, rng, scale = 1) {
     const bgColor = resolveColor(params.bgColor, palette);
     const intensity = (params.intensity || 40) / 100;
     const spacing = params.threadSpacing || 4;
@@ -28,9 +28,9 @@ registerBackground({
 
     // Horizontal threads
     ctx.strokeStyle = `rgba(${Math.max(0, rgb.r - 30)}, ${Math.max(0, rgb.g - 30)}, ${Math.max(0, rgb.b - 30)}, ${threadAlpha})`;
-    ctx.lineWidth = 0.5;
+    ctx.lineWidth = 0.5 * scale;
     for (let y = 0; y < height; y += spacing) {
-      const offset = (rng.random() - 0.5) * 0.5;
+      const offset = (rng.random() - 0.5) * 0.5 * scale;
       ctx.beginPath();
       ctx.moveTo(0, y + offset);
       ctx.lineTo(width, y + offset);
@@ -40,7 +40,7 @@ registerBackground({
     // Vertical threads
     ctx.strokeStyle = `rgba(${Math.min(255, rgb.r + 20)}, ${Math.min(255, rgb.g + 20)}, ${Math.min(255, rgb.b + 20)}, ${threadAlpha * 0.8})`;
     for (let x = 0; x < width; x += spacing) {
-      const offset = (rng.random() - 0.5) * 0.5;
+      const offset = (rng.random() - 0.5) * 0.5 * scale;
       ctx.beginPath();
       ctx.moveTo(x + offset, 0);
       ctx.lineTo(x + offset, height);

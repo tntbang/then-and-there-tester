@@ -10,9 +10,9 @@ registerBackground({
   schema: [
     { id: 'bgColor', name: 'Background', type: 'palette-color', default: 0 },
     { id: 'dotColor', name: 'Dot Color', type: 'palette-color', default: 1 },
-    { id: 'gridSize', name: 'Grid Size', type: 'number', default: 12, min: 4, max: 30, step: 1 },
-    { id: 'minDot', name: 'Min Dot', type: 'number', default: 2, min: 1, max: 10, step: 1 },
-    { id: 'maxDot', name: 'Max Dot', type: 'number', default: 10, min: 3, max: 25, step: 1 },
+    { id: 'gridSize', name: 'Grid Size', type: 'number', default: 12, min: 4, max: 30, step: 1, unit: 'px' },
+    { id: 'minDot', name: 'Min Dot', type: 'number', default: 2, min: 1, max: 10, step: 1, unit: 'px' },
+    { id: 'maxDot', name: 'Max Dot', type: 'number', default: 10, min: 3, max: 25, step: 1, unit: 'px' },
     {
       id: 'direction', name: 'Direction', type: 'select', default: 'radial',
       options: [

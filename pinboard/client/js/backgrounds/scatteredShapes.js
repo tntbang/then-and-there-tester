@@ -55,7 +55,7 @@ registerBackground({
     { id: 'shapeColor1', name: 'Shape Color 1', type: 'palette-color', default: 1 },
     { id: 'shapeColor2', name: 'Shape Color 2', type: 'palette-color', default: 2 },
     { id: 'density', name: 'Density', type: 'number', default: 40, min: 10, max: 100, step: 5 },
-    { id: 'shapeSize', name: 'Shape Size', type: 'number', default: 12, min: 5, max: 30, step: 1 },
+    { id: 'shapeSize', name: 'Shape Size', type: 'number', default: 12, min: 5, max: 30, step: 1, unit: 'px' },
     {
       id: 'shapeType', name: 'Shape', type: 'select', default: 'stars',
       options: [

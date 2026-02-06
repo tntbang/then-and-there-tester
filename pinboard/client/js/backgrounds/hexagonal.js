@@ -11,8 +11,8 @@ registerBackground({
   schema: [
     { id: 'bgColor', name: 'Background', type: 'palette-color', default: 0 },
     { id: 'lineColor', name: 'Line Color', type: 'palette-color', default: 1 },
-    { id: 'hexSize', name: 'Hex Size', type: 'number', default: 25, min: 10, max: 60, step: 2 },
-    { id: 'lineWidth', name: 'Line Width', type: 'number', default: 2, min: 1, max: 5, step: 0.5 },
+    { id: 'hexSize', name: 'Hex Size', type: 'number', default: 25, min: 10, max: 60, step: 2, unit: 'px' },
+    { id: 'lineWidth', name: 'Line Width', type: 'number', default: 2, min: 1, max: 5, step: 0.5, unit: 'px' },
     { id: 'filled', name: 'Filled', type: 'boolean', default: false },
     { id: 'fillOpacity', name: 'Fill Opacity', type: 'number', default: 20, min: 5, max: 60, step: 5, suffix: '%' }
   ],

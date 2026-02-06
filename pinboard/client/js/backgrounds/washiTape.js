@@ -14,11 +14,11 @@ registerBackground({
     { id: 'tapeColor2', name: 'Tape Color 2', type: 'palette-color', default: 1 },
     { id: 'tapeColor3', name: 'Tape Color 3', type: 'palette-color', default: 2 },
     { id: 'tapeCount', name: 'Tape Count', type: 'number', default: 5, min: 2, max: 12, step: 1 },
-    { id: 'tapeWidth', name: 'Tape Width', type: 'number', default: 40, min: 15, max: 80, step: 5 },
+    { id: 'tapeWidth', name: 'Tape Width', type: 'number', default: 40, min: 15, max: 80, step: 5, unit: 'px' },
     { id: 'opacity', name: 'Opacity', type: 'number', default: 40, min: 10, max: 70, step: 5, suffix: '%' },
     { id: 'maxAngle', name: 'Max Angle', type: 'number', default: 15, min: 0, max: 45, step: 5, suffix: '°' }
   ],
-  render(ctx, width, height, params, palette, rng) {
+  render(ctx, width, height, params, palette, rng, scale = 1) {
     const bgColor = resolveColor(params.bgColor, palette);
     const colors = [
       resolveColor(params.tapeColor1, palette),
@@ -51,7 +51,7 @@ registerBackground({
 
       // Subtle edge lines for tape look
       ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity * 0.5})`;
-      ctx.lineWidth = 0.5;
+      ctx.lineWidth = 0.5 * scale;
       ctx.beginPath();
       ctx.moveTo(-diagonal, -tapeWidth / 2);
       ctx.lineTo(diagonal, -tapeWidth / 2);

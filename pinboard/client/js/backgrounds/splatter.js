@@ -14,7 +14,7 @@ registerBackground({
     { id: 'color2', name: 'Splatter 2', type: 'palette-color', default: 1 },
     { id: 'color3', name: 'Splatter 3', type: 'palette-color', default: 2 },
     { id: 'splatCount', name: 'Splat Count', type: 'number', default: 15, min: 3, max: 40, step: 1 },
-    { id: 'splatSize', name: 'Splat Size', type: 'number', default: 40, min: 10, max: 100, step: 5 },
+    { id: 'splatSize', name: 'Splat Size', type: 'number', default: 40, min: 10, max: 100, step: 5, unit: 'px' },
     { id: 'opacity', name: 'Opacity', type: 'number', default: 60, min: 15, max: 100, step: 5, suffix: '%' },
     { id: 'droplets', name: 'Droplets', type: 'boolean', default: true }
   ],

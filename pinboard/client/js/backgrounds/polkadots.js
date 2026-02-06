@@ -10,8 +10,8 @@ registerBackground({
   schema: [
     { id: 'bgColor', name: 'Background', type: 'palette-color', default: 0 },
     { id: 'dotColor', name: 'Dot Color', type: 'palette-color', default: 1 },
-    { id: 'dotSize', name: 'Dot Size', type: 'number', default: 20, min: 5, max: 50, step: 1 },
-    { id: 'spacing', name: 'Spacing', type: 'number', default: 25, min: 10, max: 60, step: 1 }
+    { id: 'dotSize', name: 'Dot Size', type: 'number', default: 20, min: 5, max: 50, step: 1, unit: 'px' },
+    { id: 'spacing', name: 'Spacing', type: 'number', default: 25, min: 10, max: 60, step: 1, unit: 'px' }
   ],
   render(ctx, width, height, params, palette) {
     const bgColor = resolveColor(params.bgColor, palette);

@@ -11,8 +11,8 @@ registerBackground({
   schema: [
     { id: 'bgColor', name: 'Background', type: 'palette-color', default: 'white' },
     { id: 'lineColor', name: 'Line Color', type: 'palette-color', default: 0 },
-    { id: 'cellSize', name: 'Cell Size', type: 'number', default: 20, min: 8, max: 50, step: 2 },
-    { id: 'lineWidth', name: 'Line Width', type: 'number', default: 1, min: 0.5, max: 3, step: 0.5 },
+    { id: 'cellSize', name: 'Cell Size', type: 'number', default: 20, min: 8, max: 50, step: 2, unit: 'px' },
+    { id: 'lineWidth', name: 'Line Width', type: 'number', default: 1, min: 0.5, max: 3, step: 0.5, unit: 'px' },
     { id: 'opacity', name: 'Opacity', type: 'number', default: 30, min: 5, max: 80, step: 5, suffix: '%' },
     { id: 'majorEvery', name: 'Major Every', type: 'number', default: 5, min: 0, max: 10, step: 1 }
   ],

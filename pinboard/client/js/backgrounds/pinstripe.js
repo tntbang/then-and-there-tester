@@ -10,8 +10,8 @@ registerBackground({
   schema: [
     { id: 'bgColor', name: 'Background', type: 'palette-color', default: 0 },
     { id: 'lineColor', name: 'Line Color', type: 'palette-color', default: 1 },
-    { id: 'lineWidth', name: 'Line Width', type: 'number', default: 1, min: 1, max: 4, step: 0.5 },
-    { id: 'spacing', name: 'Spacing', type: 'number', default: 12, min: 4, max: 40, step: 2 },
+    { id: 'lineWidth', name: 'Line Width', type: 'number', default: 1, min: 1, max: 4, step: 0.5, unit: 'px' },
+    { id: 'spacing', name: 'Spacing', type: 'number', default: 12, min: 4, max: 40, step: 2, unit: 'px' },
     { id: 'angle', name: 'Angle', type: 'number', default: 0, min: 0, max: 180, step: 5, suffix: '°' }
   ],
   render(ctx, width, height, params, palette) {

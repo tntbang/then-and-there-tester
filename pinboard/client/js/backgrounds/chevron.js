@@ -10,8 +10,8 @@ registerBackground({
   schema: [
     { id: 'color1', name: 'Color 1', type: 'palette-color', default: 0 },
     { id: 'color2', name: 'Color 2', type: 'palette-color', default: 1 },
-    { id: 'width', name: 'Band Width', type: 'number', default: 24, min: 8, max: 60, step: 2 },
-    { id: 'amplitude', name: 'Amplitude', type: 'number', default: 20, min: 5, max: 60, step: 2 },
+    { id: 'width', name: 'Band Width', type: 'number', default: 24, min: 8, max: 60, step: 2, unit: 'px' },
+    { id: 'amplitude', name: 'Amplitude', type: 'number', default: 20, min: 5, max: 60, step: 2, unit: 'px' },
     { id: 'horizontal', name: 'Horizontal', type: 'boolean', default: false }
   ],
   render(ctx, width, height, params, palette) {

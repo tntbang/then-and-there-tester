@@ -12,8 +12,8 @@ registerBackground({
     { id: 'mediumColor', name: 'Medium Dots', type: 'palette-color', default: 1 },
     { id: 'smallColor', name: 'Small Dots', type: 'palette-color', default: 2 },
     { id: 'density', name: 'Density', type: 'number', default: 80, min: 20, max: 200, step: 5 },
-    { id: 'mediumSize', name: 'Medium Size', type: 'number', default: 8, min: 3, max: 20, step: 1 },
-    { id: 'smallSize', name: 'Small Size', type: 'number', default: 4, min: 1, max: 10, step: 1 },
+    { id: 'mediumSize', name: 'Medium Size', type: 'number', default: 8, min: 3, max: 20, step: 1, unit: 'px' },
+    { id: 'smallSize', name: 'Small Size', type: 'number', default: 4, min: 1, max: 10, step: 1, unit: 'px' },
     { id: 'sizeVariation', name: 'Size Variation', type: 'number', default: 30, min: 0, max: 100, step: 5, suffix: '%' }
   ],
   render(ctx, width, height, params, palette, rng) {

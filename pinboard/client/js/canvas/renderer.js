@@ -22,6 +22,7 @@ let lastOrientation = null;
 
 // Constants
 const IPHONE_ASPECT = 2.17; // iPhone standard aspect ratio
+const REFERENCE_SHORT_SIDE = 400; // Reference resolution for background param scaling
 
 /**
  * Initialize the renderer
@@ -184,6 +185,24 @@ function getOrderedPhotos(state) {
 }
 
 /**
+ * Scale background params that have unit: 'px' in their schema
+ * @param {Object} bg - Background definition (with schema array)
+ * @param {Object} params - Raw param values
+ * @param {number} scale - Scale factor (1 = reference resolution)
+ * @returns {Object} Params with pixel values scaled
+ */
+function scaleBackgroundParams(bg, params, scale) {
+  if (scale === 1) return params;
+  const scaled = { ...params };
+  for (const entry of bg.schema) {
+    if (entry.unit === 'px' && typeof scaled[entry.id] === 'number') {
+      scaled[entry.id] = scaled[entry.id] * scale;
+    }
+  }
+  return scaled;
+}
+
+/**
  * Render background layer using the background plugin system
  * @param {CanvasRenderingContext2D} ctx - Canvas context
  * @param {Object} options - Render options
@@ -203,13 +222,18 @@ function renderBackground(ctx, options) {
 
   // Merge stored params with defaults
   const defaults = getBackgroundDefaults(bgId);
-  const params = { ...defaults, ...state.backgroundParams };
+  const rawParams = { ...defaults, ...state.backgroundParams };
+
+  // Scale pixel-based params for current resolution
+  const shortSide = Math.min(boardWidth, boardHeight);
+  const scale = shortSide / REFERENCE_SHORT_SIDE;
+  const params = scaleBackgroundParams(bg, rawParams, scale);
 
   // Create seeded RNG for deterministic rendering
   const seed = globalParams?.seed || 12345;
   const rng = createRNG(seed);
 
-  bg.render(ctx, boardWidth, boardHeight, params, palette, rng);
+  bg.render(ctx, boardWidth, boardHeight, params, palette, rng, scale);
 }
 
 /**
