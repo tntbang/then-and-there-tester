@@ -48,25 +48,24 @@ async function init() {
  */
 function setupExport() {
   const exportBtn = document.getElementById('exportBtn');
+  const resolutionSelect = document.getElementById('exportResolution');
 
   exportBtn.addEventListener('click', async () => {
     exportBtn.classList.add('loading');
     exportBtn.disabled = true;
 
     try {
-      // Render at 2x resolution
-      const exportCanvas = await renderForExport(2);
+      const resolution = resolutionSelect.value;
+      const exportCanvas = await renderForExport(resolution);
 
-      // Convert to blob
       exportCanvas.toBlob((blob) => {
         if (!blob) {
           alert('Failed to generate export');
           return;
         }
 
-        // Create download link
         const state = getState();
-        const filename = `pinboard-${state.arrangementId}-${state.globalParams.seed}.png`;
+        const filename = `pinboard-${state.arrangementId}-${state.globalParams.seed}-${resolution}.png`;
 
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');

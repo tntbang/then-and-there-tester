@@ -136,7 +136,7 @@ async function handleUpload(files) {
 }
 
 /**
- * Render the photo list
+ * Render the photo list as a 3-column grid
  */
 function renderPhotoList() {
   const state = getState();
@@ -144,13 +144,18 @@ function renderPhotoList() {
 
   photoList.innerHTML = '';
 
+  const grid = document.createElement('div');
+  grid.className = 'photo-grid';
+
   for (const id of state.photoOrder) {
     const photo = photoMap.get(id);
     if (!photo) continue;
 
     const item = createPhotoItem(photo);
-    photoList.appendChild(item);
+    grid.appendChild(item);
   }
+
+  photoList.appendChild(grid);
 }
 
 /**
@@ -160,7 +165,7 @@ function renderPhotoList() {
  */
 function createPhotoItem(photo) {
   const item = document.createElement('div');
-  item.className = 'photo-item';
+  item.className = 'photo-grid-item';
   item.dataset.id = photo.id;
   item.draggable = true;
 
@@ -184,7 +189,7 @@ function createPhotoItem(photo) {
 
   const deleteBtn = document.createElement('button');
   deleteBtn.className = 'photo-item-btn delete';
-  deleteBtn.textContent = 'Delete';
+  deleteBtn.textContent = 'Del';
   deleteBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     deletePhoto(photo.id);
@@ -199,7 +204,6 @@ function createPhotoItem(photo) {
        Math.abs(photo.focalPoint.y - 0.5) > 0.05)) {
     const indicator = document.createElement('div');
     indicator.className = 'focal-indicator';
-    indicator.textContent = 'F';
     item.appendChild(indicator);
   }
 
@@ -257,7 +261,8 @@ export function updatePhotoCount() {
 // Drag and drop handlers
 function handleDragStart(e) {
   draggedItem = e.currentTarget;
-  draggedIndex = Array.from(photoList.children).indexOf(draggedItem);
+  const grid = photoList.querySelector('.photo-grid');
+  draggedIndex = grid ? Array.from(grid.children).indexOf(draggedItem) : -1;
   e.currentTarget.classList.add('dragging');
   e.dataTransfer.effectAllowed = 'move';
 }
@@ -279,7 +284,8 @@ async function handleDrop(e) {
   const targetItem = e.currentTarget;
   if (targetItem === draggedItem) return;
 
-  const targetIndex = Array.from(photoList.children).indexOf(targetItem);
+  const grid = photoList.querySelector('.photo-grid');
+  const targetIndex = grid ? Array.from(grid.children).indexOf(targetItem) : -1;
   if (targetIndex === -1 || draggedIndex === -1) return;
 
   // Reorder in state

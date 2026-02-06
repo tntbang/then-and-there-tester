@@ -36,7 +36,15 @@
         <canvas id="mainCanvas"></canvas>
       </div>
       <div class="canvas-controls">
-        <button class="btn btn-primary" id="exportBtn">Export</button>
+        <div class="export-controls">
+          <select id="exportResolution">
+            <option value="preview">Preview (400px)</option>
+            <option value="hd">HD (1290px)</option>
+            <option value="2k" selected>2K (2000px)</option>
+            <option value="4k">4K (3000px)</option>
+          </select>
+          <button class="btn btn-primary" id="exportBtn">Export PNG</button>
+        </div>
       </div>
     </main>
 

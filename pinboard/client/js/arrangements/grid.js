@@ -3,7 +3,7 @@
 import { registerArrangement, getPhotoCount } from './registry.js';
 import { createRNG } from '../utils/random.js';
 
-const FRAME_STYLES = ['borderless', 'bordered', 'polaroid', 'rounded', 'circle'];
+const FRAME_STYLES = ['borderless', 'bordered', 'polaroid', 'rounded', 'roundedBorderless', 'circle'];
 
 export const gridSchema = {
   name: 'Grid',
@@ -26,7 +26,7 @@ export const gridSchema = {
       id: 'rows',
       name: 'Rows',
       type: 'number',
-      default: 3,
+      default: 7,
       min: 1,
       max: 10,
       step: 1
@@ -35,7 +35,7 @@ export const gridSchema = {
       id: 'photoSizePct',
       name: 'Photo Size %',
       type: 'number',
-      default: 20,
+      default: 22,
       min: 5,
       max: 50,
       step: 1,
@@ -47,6 +47,27 @@ export const gridSchema = {
       type: 'boolean',
       default: true,
       description: 'Use same margin for horizontal and vertical'
+    },
+    {
+      id: 'rotationMax',
+      name: 'Rotation Range',
+      type: 'number',
+      default: 0,
+      min: 0,
+      max: 45,
+      step: 1,
+      suffix: '°'
+    },
+    {
+      id: 'rotationPivot',
+      name: 'Rotation Pivot',
+      type: 'select',
+      default: 'pin',
+      options: [
+        { value: 'pin', label: 'Pin Point' },
+        { value: 'center', label: 'Center' }
+      ],
+      condition: 'rotationMax'
     },
     {
       id: 'frameStyles',
@@ -78,6 +99,12 @@ export const gridSchema = {
           default: 0
         },
         {
+          id: 'roundedBorderlessWeight',
+          name: 'Rounded Borderless',
+          type: 'weight',
+          default: 0
+        },
+        {
           id: 'circleWeight',
           name: 'Circle',
           type: 'weight',
@@ -99,7 +126,7 @@ export const gridSchema = {
       id: 'polaroidMult',
       name: 'Polaroid Bottom Multiplier',
       type: 'number',
-      default: 3,
+      default: 3.5,
       min: 2,
       max: 5,
       step: 0.5,
@@ -109,11 +136,11 @@ export const gridSchema = {
       id: 'cornerRadius',
       name: 'Corner Radius %',
       type: 'number',
-      default: 10,
+      default: 35,
       min: 5,
       max: 50,
       step: 5,
-      condition: 'roundedWeight'
+      condition: { anyOf: ['roundedWeight', 'roundedBorderlessWeight'] }
     },
     {
       id: 'borderColor',
@@ -197,6 +224,7 @@ function assignFrameStyles(count, params, rng) {
     params.borderedWeight || 0,
     params.polaroidWeight || 0,
     params.roundedWeight || 0,
+    params.roundedBorderlessWeight || 0,
     params.circleWeight || 0
   ];
 
@@ -241,6 +269,14 @@ function renderGrid(ctx, options) {
   const rng = createRNG(globalParams.seed);
   const frameStyles = assignFrameStyles(layout.positions.length, params, rng);
 
+  // Generate per-photo rotation data
+  const rotationMax = params.rotationMax || 0;
+  const rotations = layout.positions.map(() => ({
+    angle: rotationMax > 0 ? rng.randomFloat(-rotationMax, rotationMax) * (Math.PI / 180) : 0,
+    pinX: rng.randomFloat(0.4, 0.6),
+    pinY: rng.randomFloat(0.03, 0.10)
+  }));
+
   // Get border color from palette
   const borderColor = getBorderColor(params.borderColor, palette);
 
@@ -263,7 +299,10 @@ function renderGrid(ctx, options) {
       borderPct: params.borderPct || 5,
       polaroidMult: params.polaroidMult || 3,
       cornerRadius: params.cornerRadius || 10,
-      focalPoint: photo.focalPoint || { x: 0.5, y: 0.5 }
+      focalPoint: photo.focalPoint || { x: 0.5, y: 0.5 },
+      rotation: rotations[i].angle,
+      rotationPivot: params.rotationPivot || 'pin',
+      pivotPoint: { x: rotations[i].pinX, y: rotations[i].pinY }
     });
   }
 
@@ -298,10 +337,26 @@ function getBorderColor(colorRef, palette) {
 function drawFramedPhoto(ctx, options) {
   const {
     img, x, y, size, frameStyle, borderColor,
-    borderPct, polaroidMult, cornerRadius, focalPoint
+    borderPct, polaroidMult, cornerRadius, focalPoint,
+    rotation = 0, rotationPivot = 'center', pivotPoint = { x: 0.5, y: 0.5 }
   } = options;
 
   ctx.save();
+
+  // Apply rotation transform
+  if (rotation !== 0) {
+    let pivotX, pivotY;
+    if (rotationPivot === 'pin') {
+      pivotX = x + size * pivotPoint.x;
+      pivotY = y + size * pivotPoint.y;
+    } else {
+      pivotX = x + size / 2;
+      pivotY = y + size / 2;
+    }
+    ctx.translate(pivotX, pivotY);
+    ctx.rotate(rotation);
+    ctx.translate(-pivotX, -pivotY);
+  }
 
   let photoX = x;
   let photoY = y;
@@ -355,6 +410,20 @@ function drawFramedPhoto(ctx, options) {
         ctx.clip();
       }
       break;
+
+    case 'roundedBorderless': {
+      // Create rounded clipping path - no border
+      const rbRadius = size * (cornerRadius / 100);
+      ctx.beginPath();
+      roundedRect(ctx, x, y, size, size, rbRadius);
+      ctx.clip();
+      // Photo fills entire area
+      photoX = x;
+      photoY = y;
+      photoW = size;
+      photoH = size;
+      break;
+    }
 
     case 'circle':
       // Create circular clipping path

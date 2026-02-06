@@ -18,33 +18,36 @@ export function generatePolkadots(size, options = {}) {
   const {
     backgroundColor = '#ffffff',
     dotColor = '#000000',
-    dotSize = 0.3,
-    spacing = 30,
+    dotSize = 20,
+    spacing = 25,
     seed = 12345
   } = options;
 
+  // Calculate tile size as multiple of pattern repeat for seamless tiling
+  const patternRepeat = dotSize + spacing;
+  const repeatCount = Math.max(2, Math.min(8, Math.ceil(128 / patternRepeat)));
+  const tileSize = patternRepeat * repeatCount;
+
   const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
+  canvas.width = tileSize;
+  canvas.height = tileSize;
   const ctx = canvas.getContext('2d');
 
   // Fill background
   ctx.fillStyle = backgroundColor;
-  ctx.fillRect(0, 0, size, size);
+  ctx.fillRect(0, 0, tileSize, tileSize);
 
-  // Draw dots
+  // Draw dots in grid pattern
   ctx.fillStyle = dotColor;
-  const rng = createRNG(seed);
-  const radius = spacing * dotSize;
+  const radius = dotSize / 2;
 
-  for (let y = 0; y < size + spacing; y += spacing) {
-    for (let x = 0; x < size + spacing; x += spacing) {
-      // Slight random offset for organic feel
-      const offsetX = (rng.random() - 0.5) * spacing * 0.1;
-      const offsetY = (rng.random() - 0.5) * spacing * 0.1;
+  for (let y = 0; y < repeatCount; y++) {
+    for (let x = 0; x < repeatCount; x++) {
+      const cx = (x * patternRepeat) + (patternRepeat / 2);
+      const cy = (y * patternRepeat) + (patternRepeat / 2);
 
       ctx.beginPath();
-      ctx.arc(x + offsetX, y + offsetY, radius, 0, Math.PI * 2);
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
       ctx.fill();
     }
   }
@@ -70,37 +73,45 @@ export function generateStripes(size, options = {}) {
     direction = 'diagonal'
   } = options;
 
+  // Pattern repeat is two stripes (one of each color)
+  const patternRepeat = stripeWidth * 2;
+  const repeatCount = Math.max(2, Math.min(8, Math.ceil(128 / patternRepeat)));
+  const tileSize = patternRepeat * repeatCount;
+
   const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
+  canvas.width = tileSize;
+  canvas.height = tileSize;
   const ctx = canvas.getContext('2d');
 
   // Fill with first color
   ctx.fillStyle = color1;
-  ctx.fillRect(0, 0, size, size);
+  ctx.fillRect(0, 0, tileSize, tileSize);
 
   ctx.fillStyle = color2;
 
-  if (direction === 'horizontal') {
-    for (let y = 0; y < size; y += stripeWidth * 2) {
-      ctx.fillRect(0, y, size, stripeWidth);
-    }
-  } else if (direction === 'vertical') {
-    for (let x = 0; x < size; x += stripeWidth * 2) {
-      ctx.fillRect(x, 0, stripeWidth, size);
-    }
-  } else {
-    // Diagonal stripes
-    ctx.save();
-    ctx.translate(size / 2, size / 2);
-    ctx.rotate(Math.PI / 4);
+  if (direction === 'diagonal') {
+    // Draw diagonal stripes
+    const diagonal = tileSize * Math.sqrt(2);
+    const stripeCount = Math.ceil(diagonal / patternRepeat) + 2;
 
-    const diagSize = size * Math.SQRT2;
-    for (let i = -diagSize; i < diagSize; i += stripeWidth * 2) {
-      ctx.fillRect(i, -diagSize, stripeWidth, diagSize * 2);
+    ctx.save();
+    ctx.translate(tileSize / 2, tileSize / 2);
+    ctx.rotate(-Math.PI / 4);
+
+    for (let i = -stripeCount; i < stripeCount; i++) {
+      const x = i * patternRepeat;
+      ctx.fillRect(x, -diagonal, stripeWidth, diagonal * 2);
     }
 
     ctx.restore();
+  } else if (direction === 'horizontal') {
+    for (let y = 0; y < tileSize; y += patternRepeat) {
+      ctx.fillRect(0, y, tileSize, stripeWidth);
+    }
+  } else if (direction === 'vertical') {
+    for (let x = 0; x < tileSize; x += patternRepeat) {
+      ctx.fillRect(x, 0, stripeWidth, tileSize);
+    }
   }
 
   return canvas;

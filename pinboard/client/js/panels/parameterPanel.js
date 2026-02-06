@@ -39,7 +39,24 @@ function setupGlobalParams() {
   orientationBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       const value = btn.dataset.value;
-      setGlobalParam('orientation', value);
+      const state = getState();
+      const prevOrientation = state.globalParams.orientation;
+
+      // Only act if orientation actually changed
+      if (value !== prevOrientation) {
+        setGlobalParam('orientation', value);
+
+        // Swap cols/rows for grid arrangement
+        if (state.arrangementId === 'grid') {
+          const { cols, rows } = state.arrangementParams;
+          if (cols !== undefined && rows !== undefined) {
+            setArrangementParam('cols', rows);
+            setArrangementParam('rows', cols);
+            loadArrangementParams();
+            updatePhotoCount();
+          }
+        }
+      }
 
       orientationBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');

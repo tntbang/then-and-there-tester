@@ -18,6 +18,7 @@ let textureCache = {};
 // Render state
 let renderScheduled = false;
 let lastRenderParams = null;
+let lastOrientation = null;
 
 // Constants
 const IPHONE_ASPECT = 2.17; // iPhone standard aspect ratio
@@ -31,6 +32,7 @@ export function initRenderer(canvasEl, container) {
   canvas = canvasEl;
   ctx = canvas.getContext('2d');
   containerEl = container;
+  lastOrientation = null;
 
   // Register layer renderers
   registerLayer('background', renderBackground);
@@ -126,6 +128,13 @@ async function render() {
 
   const state = getState();
 
+  // Check if orientation changed - need to resize canvas
+  if (lastOrientation !== state.globalParams.orientation) {
+    lastOrientation = state.globalParams.orientation;
+    handleResize();
+    return; // handleResize calls scheduleRender, which will call render() again
+  }
+
   // Check if we need to reload images
   const currentPhotoIds = state.photos.map(p => p.id).join(',');
   if (lastRenderParams?.photoIds !== currentPhotoIds) {
@@ -203,9 +212,11 @@ function renderBackground(ctx, options) {
     case 'polkadots': {
       const cacheKey = `polkadots-${backgroundColor}-${dotColor}-${globalParams.seed}`;
       if (!textureCache[cacheKey]) {
-        textureCache[cacheKey] = generatePolkadots(256, {
+        textureCache[cacheKey] = generatePolkadots(null, {
           backgroundColor: getColor(backgroundColor),
           dotColor: getColor(dotColor),
+          dotSize: 20,
+          spacing: 25,
           seed: globalParams.seed
         });
       }
@@ -218,9 +229,10 @@ function renderBackground(ctx, options) {
     case 'stripes': {
       const cacheKey = `stripes-${stripeColor1}-${stripeColor2}`;
       if (!textureCache[cacheKey]) {
-        textureCache[cacheKey] = generateStripes(256, {
+        textureCache[cacheKey] = generateStripes(null, {
           color1: getColor(stripeColor1),
           color2: getColor(stripeColor2),
+          stripeWidth: 20,
           direction: 'diagonal'
         });
       }
@@ -310,35 +322,43 @@ function renderPhotos(ctx, options) {
 }
 
 /**
+ * Resolution presets (short side in pixels)
+ */
+const EXPORT_RESOLUTIONS = {
+  preview: 400,
+  hd: 1290,
+  '2k': 2000,
+  '4k': 3000
+};
+
+/**
  * Render at specified resolution for export
- * @param {number} scale - Scale factor (1 = preview size)
+ * @param {string} resolution - Resolution preset key
  * @returns {HTMLCanvasElement} Rendered canvas
  */
-export async function renderForExport(scale = 1) {
+export async function renderForExport(resolution = '2k') {
   const state = getState();
 
-  // Create export canvas
   const exportCanvas = document.createElement('canvas');
   const isPortrait = state.globalParams.orientation === 'portrait';
   const aspectRatio = state.globalParams.aspectRatio || IPHONE_ASPECT;
 
-  // Base size (similar to preview)
-  const baseSize = 1000;
-  let width, height;
+  // Get short side from resolution preset
+  const shortSide = EXPORT_RESOLUTIONS[resolution] || EXPORT_RESOLUTIONS['2k'];
 
+  let width, height;
   if (isPortrait) {
-    width = baseSize;
-    height = baseSize * aspectRatio;
+    width = shortSide;
+    height = Math.round(shortSide * aspectRatio);
   } else {
-    height = baseSize;
-    width = baseSize * aspectRatio;
+    height = shortSide;
+    width = Math.round(shortSide * aspectRatio);
   }
 
-  exportCanvas.width = Math.round(width * scale);
-  exportCanvas.height = Math.round(height * scale);
+  exportCanvas.width = width;
+  exportCanvas.height = height;
 
   const exportCtx = exportCanvas.getContext('2d');
-  exportCtx.scale(scale, scale);
 
   // Get ordered photos
   const orderedPhotos = getOrderedPhotos(state);
