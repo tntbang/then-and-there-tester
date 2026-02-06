@@ -3,14 +3,12 @@
 import { getState, setState, setGlobalParam, setArrangementParam, subscribe } from '../state.js';
 import { getArrangement, listArrangements, getDefaultParams } from '../arrangements/registry.js';
 import { updatePhotoCount } from './photoPanel.js';
-import { clearTextureCache } from '../canvas/renderer.js';
 
 let globalParamsEl = null;
 let arrangementParamsEl = null;
 let arrangementSelect = null;
 let orientationBtns = null;
 let seedInput = null;
-let pinboardStyleSelect = null;
 
 /**
  * Initialize the parameter panel
@@ -19,7 +17,6 @@ export function initParameterPanel() {
   globalParamsEl = document.getElementById('globalParams');
   arrangementParamsEl = document.getElementById('arrangementParams');
   arrangementSelect = document.getElementById('arrangementSelect');
-  pinboardStyleSelect = document.getElementById('pinboardStyle');
   seedInput = document.getElementById('seedInput');
 
   setupGlobalParams();
@@ -67,34 +64,24 @@ function setupGlobalParams() {
   seedInput.addEventListener('change', () => {
     const value = parseInt(seedInput.value, 10) || 0;
     setGlobalParam('seed', value);
-    clearTextureCache();
   });
 
   document.getElementById('seedDown').addEventListener('click', () => {
     const current = parseInt(seedInput.value, 10) || 0;
     seedInput.value = Math.max(0, current - 1);
     setGlobalParam('seed', parseInt(seedInput.value, 10));
-    clearTextureCache();
   });
 
   document.getElementById('seedUp').addEventListener('click', () => {
     const current = parseInt(seedInput.value, 10) || 0;
     seedInput.value = current + 1;
     setGlobalParam('seed', parseInt(seedInput.value, 10));
-    clearTextureCache();
   });
 
   document.getElementById('seedRandom').addEventListener('click', () => {
     const newSeed = Math.floor(Math.random() * 100000);
     seedInput.value = newSeed;
     setGlobalParam('seed', newSeed);
-    clearTextureCache();
-  });
-
-  // Pinboard style
-  pinboardStyleSelect.addEventListener('change', () => {
-    setGlobalParam('pinboardStyle', pinboardStyleSelect.value);
-    clearTextureCache();
   });
 }
 

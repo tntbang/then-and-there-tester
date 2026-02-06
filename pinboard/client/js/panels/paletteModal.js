@@ -3,7 +3,7 @@
 import { getState, setState, subscribe } from '../state.js';
 import { extractColors } from '../color/extraction.js';
 import { generateAllPalettes } from '../color/palettes.js';
-import { clearTextureCache } from '../canvas/renderer.js';
+
 
 let modal = null;
 let optionsContainer = null;
@@ -138,7 +138,6 @@ async function extractAndGeneratePalettes() {
     });
 
     updatePalettePreview();
-    clearTextureCache();
   } finally {
     isExtracting = false;
   }
@@ -228,7 +227,6 @@ function createPaletteOption(palette, isSelected) {
 function selectPalette(palette) {
   setState({ palette });
   updatePalettePreview();
-  clearTextureCache();
 }
 
 /**

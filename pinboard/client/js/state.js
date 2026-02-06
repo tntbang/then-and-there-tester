@@ -7,14 +7,21 @@ const initialState = {
     orientation: 'portrait',
     aspectRatio: 2.17,
     seed: 12345,
-    pinboardStyle: 'solid',
-    backgroundColor: 0,
-    dotColor: 1,
-    stripeColor1: 0,
-    stripeColor2: 1
+    // Drop shadow
+    shadowEnabled: true,
+    shadowBlur: 8,
+    shadowOffsetX: 3,
+    shadowOffsetY: 4,
+    shadowOpacity: 35,
+    shadowColor: 'dark'
   },
   arrangementId: 'grid',
   arrangementParams: {},
+  // Background (replaces old pinboardStyle in globalParams)
+  backgroundId: 'solid',
+  backgroundParams: {
+    bgColor: 0
+  },
   palette: null,
   availablePalettes: [],
   presets: []
@@ -100,5 +107,16 @@ export function setGlobalParam(key, value) {
 export function setArrangementParam(key, value) {
   setState({
     arrangementParams: { ...state.arrangementParams, [key]: value }
+  });
+}
+
+/**
+ * Update a specific background parameter
+ * @param {string} key - Parameter key
+ * @param {*} value - Parameter value
+ */
+export function setBackgroundParam(key, value) {
+  setState({
+    backgroundParams: { ...state.backgroundParams, [key]: value }
   });
 }

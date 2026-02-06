@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pinboard Algorithm Tester</title>
   <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/background-panel.css">
 </head>
 <body>
   <div class="app-container">
@@ -54,6 +55,33 @@
         <h2>Parameters</h2>
       </div>
 
+      <!-- Palette (moved to top) -->
+      <div class="params-section">
+        <h3>Color Palette</h3>
+        <div class="palette-preview" id="palettePreview">
+          <div class="palette-colors">
+            <div class="palette-swatch" style="background: #e85d4c"></div>
+            <div class="palette-swatch" style="background: #e8944c"></div>
+            <div class="palette-swatch" style="background: #e8c84c"></div>
+            <div class="palette-swatch" style="background: #b8e84c"></div>
+            <div class="palette-swatch" style="background: #4ce885"></div>
+          </div>
+          <button class="btn btn-small" id="changePaletteBtn">Change</button>
+        </div>
+      </div>
+
+      <!-- Background (new gallery picker) -->
+      <div class="params-section" id="backgroundSection">
+        <h3>Background</h3>
+        <!-- backgroundPanel.js mounts here -->
+      </div>
+
+      <!-- Drop Shadow (new) -->
+      <div class="params-section" id="shadowSection">
+        <!-- Shadow controls injected by app.js -->
+      </div>
+
+      <!-- Global Settings (trimmed: no more background style dropdown) -->
       <div class="params-section">
         <h3>Global Settings</h3>
         <div id="globalParams">
@@ -86,38 +114,13 @@
               <option value="grid">Grid</option>
             </select>
           </div>
-
-          <div class="param-group">
-            <label>Background Style</label>
-            <select id="pinboardStyle">
-              <option value="solid">Solid</option>
-              <option value="polkadots">Polkadots</option>
-              <option value="stripes">Stripes</option>
-              <option value="cork">Cork</option>
-              <option value="white">White</option>
-              <option value="black">Black</option>
-            </select>
-          </div>
         </div>
       </div>
 
+      <!-- Arrangement Parameters -->
       <div class="params-section">
         <h3>Arrangement Parameters</h3>
         <div id="arrangementParams"></div>
-      </div>
-
-      <div class="params-section">
-        <h3>Color Palette</h3>
-        <div class="palette-preview" id="palettePreview">
-          <div class="palette-colors">
-            <div class="palette-swatch" style="background: #e85d4c"></div>
-            <div class="palette-swatch" style="background: #e8944c"></div>
-            <div class="palette-swatch" style="background: #e8c84c"></div>
-            <div class="palette-swatch" style="background: #b8e84c"></div>
-            <div class="palette-swatch" style="background: #4ce885"></div>
-          </div>
-          <button class="btn btn-small" id="changePaletteBtn">Change</button>
-        </div>
       </div>
     </aside>
   </div>

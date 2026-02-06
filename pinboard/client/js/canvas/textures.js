@@ -1,3 +1,5 @@
+// DEPRECATED: Replaced by client/js/backgrounds/ modules (v0.2).
+// This file is no longer imported. Safe to delete.
 // Procedural texture generators
 
 import { hexToRGB, blendColors, adjustLightness } from '../color/utils.js';

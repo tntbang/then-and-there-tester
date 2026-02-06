@@ -3,7 +3,8 @@
 import { getState, subscribe } from '../state.js';
 import { getArrangement, getPhotoCount } from '../arrangements/registry.js';
 import { registerLayer, renderLayers } from './layers.js';
-import { generatePolkadots, generateStripes, generateCork, getCorkColors } from './textures.js';
+import { getBackground, getBackgroundDefaults } from '../backgrounds/index.js';
+import { createRNG } from '../utils/random.js';
 import { loadPhotoImages } from './photoUtils.js';
 
 // Canvas references
@@ -13,7 +14,6 @@ let containerEl = null;
 
 // Cached data
 let photoImages = {};
-let textureCache = {};
 
 // Render state
 let renderScheduled = false;
@@ -184,92 +184,32 @@ function getOrderedPhotos(state) {
 }
 
 /**
- * Render background layer
+ * Render background layer using the background plugin system
  * @param {CanvasRenderingContext2D} ctx - Canvas context
  * @param {Object} options - Render options
  */
 function renderBackground(ctx, options) {
   const { boardWidth, boardHeight, globalParams, palette } = options;
-  const { pinboardStyle, backgroundColor, dotColor, stripeColor1, stripeColor2 } = globalParams;
 
-  // Get actual colors from palette or defaults
-  const getColor = (index) => {
-    if (typeof index === 'number' && palette?.colors?.[index]) {
-      return palette.colors[index];
-    }
-    if (index === 'white') return '#ffffff';
-    if (index === 'black') return '#000000';
-    if (index === 'neutral') return palette?.utilities?.neutral || '#888888';
-    return palette?.colors?.[0] || '#888888';
-  };
+  const state = getState();
+  const bgId = state.backgroundId || 'solid';
+  const bg = getBackground(bgId);
 
-  switch (pinboardStyle) {
-    case 'solid':
-      ctx.fillStyle = getColor(backgroundColor);
-      ctx.fillRect(0, 0, boardWidth, boardHeight);
-      break;
-
-    case 'polkadots': {
-      const cacheKey = `polkadots-${backgroundColor}-${dotColor}-${globalParams.seed}`;
-      if (!textureCache[cacheKey]) {
-        textureCache[cacheKey] = generatePolkadots(null, {
-          backgroundColor: getColor(backgroundColor),
-          dotColor: getColor(dotColor),
-          dotSize: 20,
-          spacing: 25,
-          seed: globalParams.seed
-        });
-      }
-      const pattern = ctx.createPattern(textureCache[cacheKey], 'repeat');
-      ctx.fillStyle = pattern;
-      ctx.fillRect(0, 0, boardWidth, boardHeight);
-      break;
-    }
-
-    case 'stripes': {
-      const cacheKey = `stripes-${stripeColor1}-${stripeColor2}`;
-      if (!textureCache[cacheKey]) {
-        textureCache[cacheKey] = generateStripes(null, {
-          color1: getColor(stripeColor1),
-          color2: getColor(stripeColor2),
-          stripeWidth: 20,
-          direction: 'diagonal'
-        });
-      }
-      const pattern = ctx.createPattern(textureCache[cacheKey], 'repeat');
-      ctx.fillStyle = pattern;
-      ctx.fillRect(0, 0, boardWidth, boardHeight);
-      break;
-    }
-
-    case 'cork': {
-      const cacheKey = `cork-${globalParams.seed}-${palette?.colors?.join(',')}`;
-      if (!textureCache[cacheKey]) {
-        textureCache[cacheKey] = generateCork(256, {
-          colors: getCorkColors(palette),
-          seed: globalParams.seed
-        });
-      }
-      const pattern = ctx.createPattern(textureCache[cacheKey], 'repeat');
-      ctx.fillStyle = pattern;
-      ctx.fillRect(0, 0, boardWidth, boardHeight);
-      break;
-    }
-
-    case 'white':
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, boardWidth, boardHeight);
-      break;
-
-    case 'black':
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(0, 0, boardWidth, boardHeight);
-      break;
-
-    default:
-      ctx.fillStyle = '#888888';
-      ctx.fillRect(0, 0, boardWidth, boardHeight);
+  if (!bg) {
+    ctx.fillStyle = '#333333';
+    ctx.fillRect(0, 0, boardWidth, boardHeight);
+    return;
   }
+
+  // Merge stored params with defaults
+  const defaults = getBackgroundDefaults(bgId);
+  const params = { ...defaults, ...state.backgroundParams };
+
+  // Create seeded RNG for deterministic rendering
+  const seed = globalParams?.seed || 12345;
+  const rng = createRNG(seed);
+
+  bg.render(ctx, boardWidth, boardHeight, params, palette, rng);
 }
 
 /**
@@ -378,13 +318,6 @@ export async function renderForExport(resolution = '2k') {
   renderLayers(exportCtx, renderOptions);
 
   return exportCanvas;
-}
-
-/**
- * Clear texture cache (call when palette changes)
- */
-export function clearTextureCache() {
-  textureCache = {};
 }
 
 /**

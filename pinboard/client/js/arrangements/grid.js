@@ -302,7 +302,8 @@ function renderGrid(ctx, options) {
       focalPoint: photo.focalPoint || { x: 0.5, y: 0.5 },
       rotation: rotations[i].angle,
       rotationPivot: params.rotationPivot || 'pin',
-      pivotPoint: { x: rotations[i].pinX, y: rotations[i].pinY }
+      pivotPoint: { x: rotations[i].pinX, y: rotations[i].pinY },
+      globalParams
     });
   }
 
@@ -338,7 +339,8 @@ function drawFramedPhoto(ctx, options) {
   const {
     img, x, y, size, frameStyle, borderColor,
     borderPct, polaroidMult, cornerRadius, focalPoint,
-    rotation = 0, rotationPivot = 'center', pivotPoint = { x: 0.5, y: 0.5 }
+    rotation = 0, rotationPivot = 'center', pivotPoint = { x: 0.5, y: 0.5 },
+    globalParams = {}
   } = options;
 
   ctx.save();
@@ -358,19 +360,39 @@ function drawFramedPhoto(ctx, options) {
     ctx.translate(-pivotX, -pivotY);
   }
 
+  // Shadow setup
+  const shadowEnabled = globalParams.shadowEnabled !== false;
+  const borderSize = size * (borderPct / 100);
+
+  function applyShadow() {
+    if (shadowEnabled) {
+      const opacity = (globalParams.shadowOpacity || 35) / 100;
+      ctx.shadowColor = `rgba(0, 0, 0, ${opacity})`;
+      ctx.shadowBlur = globalParams.shadowBlur || 8;
+      ctx.shadowOffsetX = globalParams.shadowOffsetX || 3;
+      ctx.shadowOffsetY = globalParams.shadowOffsetY || 4;
+    }
+  }
+
+  function clearShadow() {
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+  }
+
   let photoX = x;
   let photoY = y;
   let photoW = size;
   let photoH = size;
 
-  // Calculate border size
-  const borderSize = size * (borderPct / 100);
-
   switch (frameStyle) {
     case 'bordered':
-      // Draw border rectangle
+      // Draw border rectangle with shadow
+      applyShadow();
       ctx.fillStyle = borderColor;
       ctx.fillRect(x, y, size, size);
+      clearShadow();
       // Inset photo area
       photoX = x + borderSize;
       photoY = y + borderSize;
@@ -378,42 +400,60 @@ function drawFramedPhoto(ctx, options) {
       photoH = size - borderSize * 2;
       break;
 
-    case 'polaroid':
-      // Draw polaroid frame
+    case 'polaroid': {
+      // Draw polaroid frame with shadow
       const bottomBorder = borderSize * polaroidMult;
+      applyShadow();
       ctx.fillStyle = borderColor;
       ctx.fillRect(x, y, size, size);
+      clearShadow();
       // Inset photo area with larger bottom
       photoX = x + borderSize;
       photoY = y + borderSize;
       photoW = size - borderSize * 2;
       photoH = size - borderSize - bottomBorder;
       break;
+    }
 
-    case 'rounded':
-      // Create rounded clipping path
+    case 'rounded': {
+      // Draw shadow-casting rounded rect before clipping
       const radius = size * (cornerRadius / 100);
+      applyShadow();
+      ctx.beginPath();
+      roundedRect(ctx, x, y, size, size, radius);
+      ctx.fillStyle = borderColor;
+      ctx.fill();
+      clearShadow();
+      // Now clip to rounded rect
       ctx.beginPath();
       roundedRect(ctx, x, y, size, size, radius);
       ctx.clip();
-      // Draw border if weight > 0
+      // Draw border fill (already drawn above for shadow, but re-fill inside clip for clean edges)
+      ctx.fillStyle = borderColor;
+      ctx.fillRect(x, y, size, size);
       if (borderSize > 0) {
-        ctx.fillStyle = borderColor;
-        ctx.fillRect(x, y, size, size);
         photoX = x + borderSize;
         photoY = y + borderSize;
         photoW = size - borderSize * 2;
         photoH = size - borderSize * 2;
-        // Re-clip for photo
+        // Re-clip for photo inset
         ctx.beginPath();
         roundedRect(ctx, photoX, photoY, photoW, photoH, Math.max(0, radius - borderSize));
         ctx.clip();
       }
       break;
+    }
 
     case 'roundedBorderless': {
-      // Create rounded clipping path - no border
+      // Draw shadow-casting rounded rect before clipping
       const rbRadius = size * (cornerRadius / 100);
+      applyShadow();
+      ctx.beginPath();
+      roundedRect(ctx, x, y, size, size, rbRadius);
+      ctx.fillStyle = 'rgba(0,0,0,1)';
+      ctx.fill();
+      clearShadow();
+      // Now clip to rounded rect
       ctx.beginPath();
       roundedRect(ctx, x, y, size, size, rbRadius);
       ctx.clip();
@@ -425,17 +465,24 @@ function drawFramedPhoto(ctx, options) {
       break;
     }
 
-    case 'circle':
-      // Create circular clipping path
+    case 'circle': {
+      // Draw shadow-casting circle before clipping
       const circleRadius = size / 2;
+      applyShadow();
+      ctx.beginPath();
+      ctx.arc(x + circleRadius, y + circleRadius, circleRadius, 0, Math.PI * 2);
+      ctx.fillStyle = borderSize > 0 ? borderColor : 'rgba(0,0,0,1)';
+      ctx.fill();
+      clearShadow();
+      // Now clip to circle
       ctx.beginPath();
       ctx.arc(x + circleRadius, y + circleRadius, circleRadius, 0, Math.PI * 2);
       ctx.clip();
       // Draw border
       if (borderSize > 0) {
         ctx.fillStyle = borderColor;
-        ctx.fill();
-        // Smaller circle for photo
+        ctx.fillRect(x, y, size, size);
+        // Smaller circle clip for photo
         ctx.beginPath();
         ctx.arc(x + circleRadius, y + circleRadius, circleRadius - borderSize, 0, Math.PI * 2);
         ctx.clip();
@@ -445,17 +492,22 @@ function drawFramedPhoto(ctx, options) {
         photoH = size - borderSize * 2;
       }
       break;
+    }
 
     case 'borderless':
     default:
-      // No frame, use full size
+      // Draw shadow-casting rect, then photo covers it
+      applyShadow();
+      ctx.fillStyle = 'rgba(0,0,0,1)';
+      ctx.fillRect(x, y, size, size);
+      clearShadow();
       break;
   }
 
   // Calculate crop rectangle based on focal point
   const crop = calculateCrop(img.width, img.height, photoW / photoH, focalPoint.x, focalPoint.y);
 
-  // Draw the photo
+  // Draw the photo (shadow already cleared)
   ctx.drawImage(
     img,
     crop.x, crop.y, crop.width, crop.height,
