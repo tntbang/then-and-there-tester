@@ -41,11 +41,15 @@ async function init() {
   // Initialize background gallery
   const bgSection = document.getElementById('backgroundSection');
   if (bgSection) {
-    initBackgroundPanel(bgSection);
+    const bgContent = bgSection.querySelector('.params-section-content') || bgSection;
+    initBackgroundPanel(bgContent);
   }
 
   // Initialize drop shadow controls
   initShadowControls();
+
+  // Initialize collapsible sections
+  initCollapsibleSections();
 
   // Setup export button
   setupExport();
@@ -157,7 +161,8 @@ function initShadowControls() {
   const section = document.getElementById('shadowSection');
   if (!section) return;
 
-  section.innerHTML = `
+  const contentEl = section.querySelector('.params-section-content') || section;
+  contentEl.innerHTML = `
     <div class="shadow-controls">
       <div class="shadow-controls-header">
         <label>Drop Shadow</label>
@@ -186,13 +191,13 @@ function initShadowControls() {
   const state = getState();
   const gp = state.globalParams;
 
-  const enabledEl = section.querySelector('#shadowEnabled');
+  const enabledEl = contentEl.querySelector('#shadowEnabled');
   enabledEl.checked = gp.shadowEnabled !== false;
 
   const sliders = ['shadowBlur', 'shadowOffsetX', 'shadowOffsetY', 'shadowOpacity'];
   for (const id of sliders) {
-    const slider = section.querySelector(`#${id}`);
-    const valEl = section.querySelector(`#${id}Val`);
+    const slider = contentEl.querySelector(`#${id}`);
+    const valEl = contentEl.querySelector(`#${id}Val`);
     slider.value = gp[id] ?? slider.value;
     valEl.textContent = slider.value + (id === 'shadowOpacity' ? '%' : '');
 
@@ -204,11 +209,28 @@ function initShadowControls() {
 
   enabledEl.addEventListener('change', () => {
     setGlobalParam('shadowEnabled', enabledEl.checked);
-    section.querySelector('#shadowParams').style.display = enabledEl.checked ? '' : 'none';
+    contentEl.querySelector('#shadowParams').style.display = enabledEl.checked ? '' : 'none';
   });
 
   // Initial visibility
-  section.querySelector('#shadowParams').style.display = enabledEl.checked ? '' : 'none';
+  contentEl.querySelector('#shadowParams').style.display = enabledEl.checked ? '' : 'none';
+}
+
+/**
+ * Initialize collapsible section headers
+ */
+function initCollapsibleSections() {
+  const headers = document.querySelectorAll('.params-section-header');
+  headers.forEach(header => {
+    header.addEventListener('click', () => {
+      const toggle = header.querySelector('.params-section-toggle');
+      const content = header.nextElementSibling;
+      if (!content || !content.classList.contains('params-section-content')) return;
+
+      toggle.classList.toggle('collapsed');
+      content.classList.toggle('collapsed');
+    });
+  });
 }
 
 // Initialize when DOM is ready

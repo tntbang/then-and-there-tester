@@ -57,33 +57,41 @@
 
       <!-- Palette (moved to top) -->
       <div class="params-section">
-        <h3>Color Palette</h3>
-        <div class="palette-preview" id="palettePreview">
-          <div class="palette-colors">
-            <div class="palette-swatch" style="background: #e85d4c"></div>
-            <div class="palette-swatch" style="background: #e8944c"></div>
-            <div class="palette-swatch" style="background: #e8c84c"></div>
-            <div class="palette-swatch" style="background: #b8e84c"></div>
-            <div class="palette-swatch" style="background: #4ce885"></div>
+        <h3 class="params-section-header">Color Palette<span class="params-section-toggle">&#9660;</span></h3>
+        <div class="params-section-content">
+          <div class="palette-preview" id="palettePreview">
+            <div class="palette-colors">
+              <div class="palette-swatch" style="background: #e85d4c"></div>
+              <div class="palette-swatch" style="background: #e8944c"></div>
+              <div class="palette-swatch" style="background: #e8c84c"></div>
+              <div class="palette-swatch" style="background: #b8e84c"></div>
+              <div class="palette-swatch" style="background: #4ce885"></div>
+            </div>
+            <button class="btn btn-small" id="changePaletteBtn">Change</button>
           </div>
-          <button class="btn btn-small" id="changePaletteBtn">Change</button>
         </div>
       </div>
 
       <!-- Background (new gallery picker) -->
       <div class="params-section" id="backgroundSection">
-        <h3>Background</h3>
-        <!-- backgroundPanel.js mounts here -->
+        <h3 class="params-section-header">Background<span class="params-section-toggle">&#9660;</span></h3>
+        <div class="params-section-content">
+          <!-- backgroundPanel.js mounts here -->
+        </div>
       </div>
 
       <!-- Drop Shadow (new) -->
       <div class="params-section" id="shadowSection">
-        <!-- Shadow controls injected by app.js -->
+        <h3 class="params-section-header">Drop Shadow<span class="params-section-toggle">&#9660;</span></h3>
+        <div class="params-section-content">
+          <!-- Shadow controls injected by app.js -->
+        </div>
       </div>
 
       <!-- Global Settings (trimmed: no more background style dropdown) -->
       <div class="params-section">
-        <h3>Global Settings</h3>
+        <h3 class="params-section-header">Global Settings<span class="params-section-toggle">&#9660;</span></h3>
+        <div class="params-section-content">
         <div id="globalParams">
           <div class="param-group">
             <label>Orientation</label>
@@ -115,12 +123,15 @@
             </select>
           </div>
         </div>
+        </div>
       </div>
 
       <!-- Arrangement Parameters -->
       <div class="params-section">
-        <h3>Arrangement Parameters</h3>
-        <div id="arrangementParams"></div>
+        <h3 class="params-section-header">Arrangement Parameters<span class="params-section-toggle">&#9660;</span></h3>
+        <div class="params-section-content">
+          <div id="arrangementParams"></div>
+        </div>
       </div>
     </aside>
   </div>

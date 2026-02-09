@@ -273,6 +273,32 @@ body {
   color: var(--text-secondary);
 }
 
+/* Collapsible section headers */
+.params-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.params-section-header:hover {
+  color: var(--text-primary);
+}
+
+.params-section-toggle {
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.params-section-toggle.collapsed {
+  transform: rotate(-90deg);
+}
+
+.params-section-content.collapsed {
+  display: none;
+}
+
 .param-group {
   margin-bottom: 12px;
 }

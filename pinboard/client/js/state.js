@@ -22,6 +22,7 @@ const initialState = {
   backgroundParams: {
     bgColor: 0
   },
+  backgroundParamsCache: {},
   palette: null,
   availablePalettes: [],
   presets: []
@@ -116,7 +117,12 @@ export function setArrangementParam(key, value) {
  * @param {*} value - Parameter value
  */
 export function setBackgroundParam(key, value) {
+  const newParams = { ...state.backgroundParams, [key]: value };
   setState({
-    backgroundParams: { ...state.backgroundParams, [key]: value }
+    backgroundParams: newParams,
+    backgroundParamsCache: {
+      ...state.backgroundParamsCache,
+      [state.backgroundId]: newParams
+    }
   });
 }

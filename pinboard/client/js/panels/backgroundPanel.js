@@ -114,8 +114,19 @@ function createThumbnail(bg) {
   renderThumbnail(bg, canvas);
 
   wrapper.addEventListener('click', () => {
-    const defaults = getBackgroundDefaults(bg.id);
-    setState({ backgroundId: bg.id, backgroundParams: defaults });
+    const state = getState();
+    // Save current background's params to cache before switching
+    const updatedCache = {
+      ...state.backgroundParamsCache,
+      [state.backgroundId]: state.backgroundParams
+    };
+    // Restore cached params for the new background, or fall back to defaults
+    const newParams = updatedCache[bg.id] || getBackgroundDefaults(bg.id);
+    setState({
+      backgroundId: bg.id,
+      backgroundParams: newParams,
+      backgroundParamsCache: updatedCache
+    });
   });
 
   return wrapper;
